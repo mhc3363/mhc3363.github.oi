@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>验证页面</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:#111;
+  font-family:system-ui;
+  overflow:hidden;
+}
+/* 验证盒子 */
+.verify-box{
+  width:320px;
+  padding:30px;
+  background:#fff;
+  border-radius:14px;
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  text-align:center;
+  z-index:99;
+}
+.verify-box h3{margin-bottom:20px;color:#222}
+#ans{
+  width:180px;padding:10px;font-size:18px;text-align:center;border:1px solid #ccc;border-radius:8px
+}
+#submit{
+  margin-top:16px;padding:10px 24px;border:none;background:#2563eb;color:#fff;border-radius:8px;font-size:16px;cursor:pointer
+}
+.tip{margin-top:12px;color:red;height:20px}
+/* 满屏文字 */
+.text-item{
+  position:absolute;
+  color:#fff;
+  font-size:32px;
+  font-weight:bold;
+  white-space:nowrap;
+}
+</style>
+</head>
+<body>
+<div class="verify-box" id="box">
+  <h3>人机验证：78 + 13 = ?</h3>
+  <input type="number" id="ans" placeholder="输入答案">
+  <br>
+  <button id="submit">提交</button>
+  <div class="tip" id="tip"></div>
+</div>
+
+<script>
+const box = document.getElementById('box')
+const tip = document.getElementById('tip')
+const submit = document.getElementById('submit')
+const input = document.getElementById('ans')
+const rightAnswer = 91
+let textList = []
+
+submit.onclick = ()=>{
+  let val = Number(input.value.trim())
+  if(val === rightAnswer){
+    box.style.display = 'none'
+    createTexts()
+    animate()
+  }else{
+    tip.innerText = '答案错误，请重试'
+  }
+}
+input.onkeydown = (e)=>{
+  if(e.key === 'Enter') submit.click()
+}
+
+// 生成文字
+function createTexts(){
+  const text = "刘昊宇艾达斐济"
+  for(let i=0;i<120;i++){
+    let el = document.createElement('div')
+    el.className = 'text-item'
+    el.innerText = text
+    let size = 24 + Math.random()*30
+    el.style.fontSize = size+'px'
+    el.style.color = `hsl(${Math.random()*360}, 85%, 70%)`
+
+    const w = window.innerWidth
+    const h = window.innerHeight
+    let x = Math.random() * w
+    let y = Math.random() * h
+    // 随机速度
+    let vx = (Math.random()-0.5)*3
+    let vy = (Math.random()-0.5)*3
+
+    el.style.left = x+'px'
+    el.style.top = y+'px'
+    document.body.appendChild(el)
+    textList.push({el,x,y,vx,vy,size})
+  }
+}
+
+// 动画循环，碰到边界反弹
+function animate(){
+  const w = window.innerWidth
+  const h = window.innerHeight
+  for(let item of textList){
+    item.x += item.vx
+    item.y += item.vy
+    // 边界反弹
+    if(item.x <=0 || item.x >= w - 200) item.vx *= -1
+    if(item.y <=0 || item.y >= h - item.size) item.vy *= -1
+
+    item.el.style.left = item.x + 'px'
+    item.el.style.top = item.y + 'px'
+  }
+  requestAnimationFrame(animate)
+}
+</script>
+</body>
+</html>
